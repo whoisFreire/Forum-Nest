@@ -6,5 +6,9 @@ export default [
   globalIgnores([
     'data',
     'node_modules',
-  ])
+  ]), {
+    rules: {
+      'no-useless-constructor': 'off',
+    }
+  }
 ]
