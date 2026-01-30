@@ -7,7 +7,7 @@ export class ZodValidationPipe implements PipeTransform {
 
   async transform(value: unknown) {
     try {
-      this.schema.parse(value)
+      return this.schema.parse(value)
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new BadRequestException({
@@ -23,6 +23,5 @@ export class ZodValidationPipe implements PipeTransform {
       }
       throw new BadRequestException('Validation failed')
     }
-    return value
   }
 }
