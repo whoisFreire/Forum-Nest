@@ -4,23 +4,27 @@ import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { Env } from '../env'
 import { AuthenticateController } from '../controllers/authenticate-controller'
+import { PrismaService } from '../prisma/prisma.service'
 
 @Module({
-  imports: [ PassportModule, JwtModule.registerAsync({
-    inject: [ ConfigService ],
-    global: true,
-    useFactory(config: ConfigService<Env, true>) {
-      const privateKey = Buffer.from(config.get('JWT_PRIVATE_KEY', { infer: true }), 'base64')
-      const publicKey = Buffer.from(config.get('JWT_PUBLIC_KEY', { infer: true }), 'base64')
-      return {
-        privateKey,
-        publicKey,
-        signOptions: {
-          algorithm: 'RS256',
-        },
+  imports: [
+    PassportModule,
+    JwtModule.registerAsync({
+      inject: [ ConfigService ],
+      global: true,
+      useFactory(config: ConfigService<Env, true>) {
+        const privateKey = Buffer.from(config.get('JWT_PRIVATE_KEY', { infer: true }), 'base64')
+        const publicKey = Buffer.from(config.get('JWT_PUBLIC_KEY', { infer: true }), 'base64')
+        return {
+          privateKey,
+          publicKey,
+          signOptions: {
+            algorithm: 'RS256',
+          },
+        }
       }
-    }
-  }) ],
+    }) ],
   controllers: [ AuthenticateController ],
+  providers: [ PrismaService ],
 })
 export class AuthModule {}
