@@ -11,16 +11,38 @@ const createQuestionBodySchema = z.object({
   content: z.string(),
 })
 
+const validator = new ZodValidationPipe(createQuestionBodySchema)
+
 type CreateQuestionBody = z.infer<typeof createQuestionBodySchema>
 
 @Controller('/questions')
 @UseGuards(JwtAuthGuard)
-@UsePipes(new ZodValidationPipe(createQuestionBodySchema))
+@UsePipes()
 export class CreateQuestionController {
   constructor(private readonly prismaService: PrismaService) {}
 
   @Post()
-  async handle(@CurrentUser() user: UserPayload, @Body() body: CreateQuestionBody) {
-    return { body }
+  async handle(@CurrentUser() user: UserPayload, @Body(validator) body: CreateQuestionBody) {
+    const { title, content } = body
+    const { sub: userId } = user
+
+    const slug = this.convertToSlug(title)
+    await this.prismaService.question.create({
+      data: {
+        title,
+        content,
+        slug,
+        authorId: userId
+      }
+    })
+  }
+
+  private convertToSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
   }
 }
