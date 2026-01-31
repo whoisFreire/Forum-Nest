@@ -10,6 +10,7 @@ export default [
     rules: {
       'no-undef': 'off',
       'no-useless-constructor': 'off',
+      'no-new': 'off',
     }
   }
 ]
